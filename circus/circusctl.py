@@ -13,6 +13,7 @@ try:
 except ImportError:
     pygments = False    # NOQA
 
+from circus import __version__
 from circus.client import CircusClient
 from circus.consumer import CircusConsumer
 from circus.commands import get_commands
@@ -94,8 +95,9 @@ class ControllerApp(object):
             'prettify': {'default': False, 'action': 'store_true',
                          'help': 'prettify output'},
             'ssh': {'default': None, 'help': 'SSH Server'},
-            'version': {'default': False, 'action': 'store_true',
-                        'help': 'display version and exit'}
+            'version': {'action': 'version',
+                        'help': 'display version and exit',
+                        'version': __version__}
         }
 
     def run(self, args):
@@ -120,7 +122,8 @@ class ControllerApp(object):
     def get_globalopts(self, args):
         globalopts = {}
         for option in self.options:
-            globalopts[option] = getattr(args, option)
+            if hasattr(args, option):
+                globalopts[option] = getattr(args, option)
         return globalopts
 
     def dispatch(self, args):
@@ -132,37 +135,36 @@ class ControllerApp(object):
         for option in self.options:
             parser.add_argument('--' + option, **self.options[option])
 
-        parser.add_argument('command', nargs="?", choices=self.commands)
-        parser.add_argument('args', nargs="*", help=argparse.SUPPRESS)
+        subparsers = parser.add_subparsers(dest='command')
+        for command in self.commands:
+            subparser = subparsers.add_parser(command)
+            subparser.add_argument('args', nargs="*", help=argparse.SUPPRESS)
+            if command == 'add':
+                subparser.add_argument('--start', action='store_true',
+                                       default=False)
 
         args = parser.parse_args()
         globalopts = self.get_globalopts(args)
         opts = {}
+        if hasattr(args, 'start'):
+            opts['start'] = args.start
 
-        if args.version:
-            return self.display_version()
+        if args.command not in self.commands:
+            msg = 'Unknown command %r' % args.command
+            msg += '\nPossible values: %s' % ', '.join(self.commands)
+            parser.print_help()
+            sys.exit(0)
         else:
-            if args.command not in self.commands:
-                msg = 'Unknown command %r' % args.command
-                msg += '\nPossible values: %s' % ', '.join(self.commands)
-                parser.print_help()
-                sys.exit(0)
-            else:
-                cmd = self.commands[args.command]
-                if args.endpoint is None:
-                    if cmd.msg_type == 'sub':
-                        args.endpoint = DEFAULT_ENDPOINT_SUB
-                    else:
-                        args.endpoint = DEFAULT_ENDPOINT_DEALER
-                msg = cmd.message(*args.args, **opts)
-                handler = getattr(self, "handle_%s" % cmd.msg_type)
-                return handler(cmd, globalopts, msg, args.endpoint,
-                               int(args.timeout), args.ssh)
-
-    def display_version(self, *args, **opts):
-        from circus import __version__
-        print(__version__)
-        return 0
+            cmd = self.commands[args.command]
+            if args.endpoint is None:
+                if cmd.msg_type == 'sub':
+                    args.endpoint = DEFAULT_ENDPOINT_SUB
+                else:
+                    args.endpoint = DEFAULT_ENDPOINT_DEALER
+            msg = cmd.message(*args.args, **opts)
+            handler = getattr(self, "handle_%s" % cmd.msg_type)
+            return handler(cmd, globalopts, msg, args.endpoint,
+                           int(args.timeout), args.ssh)
 
     def handle_sub(self, cmd, opts, topics, endpoint, timeout, ssh_server):
         consumer = CircusConsumer(topics, endpoint=endpoint)
