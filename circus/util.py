@@ -513,17 +513,21 @@ class StrictConfigParser(ConfigParser):
                 if isinstance(val, list):
                     options[name] = '\n'.join(val)
 
+def parse_ssh_server(ssh_server):
+    return ssh_server, None
 
 def get_connection(socket, endpoint, ssh_server):
     if ssh_server is None:
         socket.connect(endpoint)
     else:
+        server, password = parse_ssh_server(ssh_server)
         try:
             try:
-                ssh.tunnel_connection(socket, endpoint, ssh_server)
+                ssh.tunnel_connection(socket, endpoint, server,
+                                      password=password)
             except ImportError:
-                ssh.tunnel_connection(socket, endpoint, ssh_server,
-                                      paramiko=True)
+                ssh.tunnel_connection(socket, endpoint, server,
+                                      password=password, paramiko=True)
         except ImportError:
             raise ImportError("pexpect was not found, and failed to use "
                               "Paramiko.  You need to install Paramiko")
