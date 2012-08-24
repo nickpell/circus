@@ -9,6 +9,7 @@ import re
 import sys
 import shlex
 import time
+import urllib
 from zmq import ssh
 from ConfigParser import (ConfigParser, MissingSectionHeaderError,
                           ParsingError, DEFAULTSECT)
@@ -514,12 +515,12 @@ class StrictConfigParser(ConfigParser):
                     options[name] = '\n'.join(val)
 
 def parse_ssh_server(ssh_server):
-    if '@' in ssh_server:
-        user, address = ssh_server.split('@', 1)
-        if ':' in user:
-            username, password = user.split(':')
-            return user + '@' + address, password
-    return ssh_server, None
+    credentials, address = urllib.splituser(ssh_server)
+    if credentials is not None:
+        user, password = urllib.splitpasswd(credentials)
+        return user + '@' + address, password
+    else:
+        return ssh_server, None
 
 def get_connection(socket, endpoint, ssh_server):
     if ssh_server is None:
