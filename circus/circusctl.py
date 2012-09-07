@@ -155,6 +155,9 @@ class ControllerApp(object):
                 print textwrap.dedent(cmd.__doc__)
                 return 0
 
+            if hasattr(args, 'start'):
+                opts['start'] = args.start 
+
             if args.endpoint is None:
                 if cmd.msg_type == 'sub':
                     args.endpoint = DEFAULT_ENDPOINT_SUB
