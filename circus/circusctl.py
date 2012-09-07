@@ -96,8 +96,9 @@ class ControllerApp(object):
             'prettify': {'default': False, 'action': 'store_true',
                          'help': 'prettify output'},
             'ssh': {'default': None, 'help': 'SSH Server'},
-            'version': {'default': False, 'action': 'store_true',
-                        'help': 'display version and exit'}
+            'version': {'action': 'version',
+                        'help': 'display version and exit',
+                        'version': __version__}
         }
 
     def run(self, args):
