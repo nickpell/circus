@@ -14,6 +14,7 @@ try:
 except ImportError:
     pygments = False    # NOQA
 
+from circus import __version__
 from circus.client import CircusClient
 from circus.consumer import CircusConsumer
 from circus.commands import get_commands
