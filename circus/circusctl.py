@@ -146,7 +146,7 @@ class ControllerApp(object):
 
         if args.version:
             return self.display_version()
-        elif args.command is None:
+        if args.command is None:
             parser.print_help()
             return 0
         else:
