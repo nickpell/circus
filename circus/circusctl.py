@@ -150,6 +150,12 @@ class ControllerApp(object):
             parser.print_help()
             return 0
         else:
+            if args.command not in self.commands:
+                msg = 'Unknown command %r' % args.command
+                msg += '\nPossible values: %s' % ', '.join(self.commands)
+                parser.print_help()
+                sys.exit(0)
+
             cmd = self.commands[args.command]
             if args.help:
                 print textwrap.dedent(cmd.__doc__)
