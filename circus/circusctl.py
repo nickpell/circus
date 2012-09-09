@@ -141,7 +141,8 @@ class ControllerApp(object):
             subparsers = parser.add_subparsers(dest='command')
             for command in self.commands:
                 subparser = subparsers.add_parser(command)
-                subparser.add_argument('args', nargs="*", help=argparse.SUPPRESS)
+                subparser.add_argument('args', nargs="*",
+                                       help=argparse.SUPPRESS)
                 if command == 'add':
                     subparser.add_argument('--start', action='store_true',
                                            default=False)
