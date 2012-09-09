@@ -167,7 +167,7 @@ class ControllerApp(object):
                 return 0
             else:
                 if hasattr(args, 'start'):
-                    opts['start'] = args.start 
+                    opts['start'] = args.start
 
                 if args.endpoint is None:
                     if cmd.msg_type == 'sub':
