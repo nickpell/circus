@@ -91,7 +91,7 @@ class ControllerApp(object):
         self.options = {
             'endpoint': {'default': None, 'help': 'connection endpoint'},
             'timeout': {'default': 5, 'help': 'connection timeout'},
-            'help': {'action': 'store_true', 'help': 'Show help and exit'}
+            'help': {'action': 'store_true', 'help': 'Show help and exit'},
             'json': {'default': False, 'action': 'store_true',
                      'help': 'output to JSON'},
             'prettify': {'default': False, 'action': 'store_true',
