@@ -137,8 +137,15 @@ class ControllerApp(object):
 
         parser.add_argument('--help', action='store_true',
                             help='Show help and exit')
-        parser.add_argument('command', nargs="?", choices=self.commands)
-        parser.add_argument('args', nargs="*", help=argparse.SUPPRESS)
+
+        if True in [value in self.commands for value in sys.argv]:
+            subparsers = parser.add_subparsers(dest='command')
+            for command in self.commands:
+                subparser = subparsers.add_parser(command)
+                subparser.add_argument('args', nargs="*", help=argparse.SUPPRESS)
+                if command == 'add':
+                    subparser.add_argument('--start', action='store_true',
+                                           default=False)
 
         args = parser.parse_args()
         globalopts = self.get_globalopts(args)
@@ -146,7 +153,7 @@ class ControllerApp(object):
 
         if args.version:
             return self.display_version()
-        if args.command is None:
+        if not hasattr(args, 'command'):
             parser.print_help()
             return 0
         else:
