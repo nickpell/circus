@@ -98,6 +98,7 @@ class ControllerApp(object):
             'prettify': {'default': False, 'action': 'store_true',
                          'help': 'prettify output'},
             'ssh': {'default': None, 'help': 'SSH Server'}
+            'version': {'action': 'version', version: __version__}
         }
 
     def run(self, args):
@@ -130,8 +131,7 @@ class ControllerApp(object):
         usage = '%(prog)s [options] command [args]'
         parser = argparse.ArgumentParser(
                 description="Controls a Circus daemon",
-                formatter_class=_Help, usage=usage, add_help=False,
-                version=__version__)
+                formatter_class=_Help, usage=usage, add_help=False)
 
         for option in self.options:
             parser.add_argument('--' + option, **self.options[option])
