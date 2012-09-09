@@ -150,8 +150,6 @@ class ControllerApp(object):
         globalopts = self.get_globalopts(args)
         opts = {}
 
-        if args.version:
-            return self.display_version()
         if not hasattr(args, 'command'):
             for command in self.commands:
                 doc = textwrap.dedent(self.commands[command].__doc__)
@@ -177,11 +175,6 @@ class ControllerApp(object):
                 handler = getattr(self, "handle_%s" % cmd.msg_type)
                 return handler(cmd, globalopts, msg, args.endpoint,
                                int(args.timeout), args.ssh)
-
-    def display_version(self, *args, **opts):
-        from circus import __version__
-        print(__version__)
-        return 0
 
     def handle_sub(self, cmd, opts, topics, endpoint, timeout, ssh_server):
         consumer = CircusConsumer(topics, endpoint=endpoint)
