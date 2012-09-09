@@ -97,8 +97,8 @@ class ControllerApp(object):
                      'help': 'output to JSON'},
             'prettify': {'default': False, 'action': 'store_true',
                          'help': 'prettify output'},
-            'ssh': {'default': None, 'help': 'SSH Server'}
-            'version': {'action': 'version', version: __version__}
+            'ssh': {'default': None, 'help': 'SSH Server'},
+            'version': {'action': 'version', 'version': __version__}
         }
 
     def run(self, args):
