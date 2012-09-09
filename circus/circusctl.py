@@ -153,7 +153,7 @@ class ControllerApp(object):
 
         if args.version:
             return self.display_version()
-        if not hasattr(args, 'command'):
+        if not hasattr(args, 'command') or args.help:
             parser.print_help()
             return 0
         else:
