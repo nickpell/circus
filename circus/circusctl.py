@@ -153,33 +153,31 @@ class ControllerApp(object):
 
         if args.version:
             return self.display_version()
-        if not hasattr(args, 'command') or args.help:
+        if not hasattr(args, 'command'):
+            for command in self.commands:
+                doc = textwrap.dedent(self.commands[command].__doc__)
+                help = doc.split('\n')[0]
+                parser.add_argument(command, help=help)
             parser.print_help()
             return 0
         else:
-            if args.command not in self.commands:
-                msg = 'Unknown command %r' % args.command
-                msg += '\nPossible values: %s' % ', '.join(self.commands)
-                parser.print_help()
-                sys.exit(0)
-
             cmd = self.commands[args.command]
             if args.help:
                 print textwrap.dedent(cmd.__doc__)
                 return 0
+            else:
+                if hasattr(args, 'start'):
+                    opts['start'] = args.start 
 
-            if hasattr(args, 'start'):
-                opts['start'] = args.start 
-
-            if args.endpoint is None:
-                if cmd.msg_type == 'sub':
-                    args.endpoint = DEFAULT_ENDPOINT_SUB
-                else:
-                    args.endpoint = DEFAULT_ENDPOINT_DEALER
-            msg = cmd.message(*args.args, **opts)
-            handler = getattr(self, "handle_%s" % cmd.msg_type)
-            return handler(cmd, globalopts, msg, args.endpoint,
-                           int(args.timeout), args.ssh)
+                if args.endpoint is None:
+                    if cmd.msg_type == 'sub':
+                        args.endpoint = DEFAULT_ENDPOINT_SUB
+                    else:
+                        args.endpoint = DEFAULT_ENDPOINT_DEALER
+                msg = cmd.message(*args.args, **opts)
+                handler = getattr(self, "handle_%s" % cmd.msg_type)
+                return handler(cmd, globalopts, msg, args.endpoint,
+                               int(args.timeout), args.ssh)
 
     def display_version(self, *args, **opts):
         from circus import __version__
