@@ -91,6 +91,7 @@ class ControllerApp(object):
         self.options = {
             'endpoint': {'default': None, 'help': 'connection endpoint'},
             'timeout': {'default': 5, 'help': 'connection timeout'},
+            'help': {'action': 'store_true', 'help': 'Show help and exit'}
             'json': {'default': False, 'action': 'store_true',
                      'help': 'output to JSON'},
             'prettify': {'default': False, 'action': 'store_true',
@@ -134,9 +135,6 @@ class ControllerApp(object):
 
         for option in self.options:
             parser.add_argument('--' + option, **self.options[option])
-
-        parser.add_argument('--help', action='store_true',
-                            help='Show help and exit')
 
         if True in [value in self.commands for value in sys.argv]:
             subparsers = parser.add_subparsers(dest='command')
